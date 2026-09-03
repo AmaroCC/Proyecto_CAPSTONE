@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Rincón del Dualista - Marketplace TCG</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: #0b0c16;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Barra de Navegación */
+    .navbar {
+      background-color: #121324;
+      border-bottom: 1px solid #232542;
+      padding: 0.85rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+
+    .nav-link:hover {
+      color: #38bdf8;
+    }
+
+    .btn-nav {
+      background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-nav:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
+    }
+
+    /* Hero Section */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 1.5rem 2.5rem 1.5rem;
+      position: relative;
+      background: radial-gradient(circle at 50% 20%, rgba(124, 58, 237, 0.15) 0%, rgba(11, 12, 22, 0) 70%);
+    }
+
+    .badge-hero {
+      background-color: #1e1b4b;
+      border: 1px solid #6366f1;
+      color: #c7d2fe;
+      padding: 0.35rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .hero-title {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1.2;
+      max-width: 800px;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #a855f7 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-desc {
+      color: #94a3b8;
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .btn-scan-main {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      text-decoration: none;
+      padding: 0.9rem 2rem;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 8px 25px rgba(6, 182, 212, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-scan-main:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.5);
+    }
+
+    /* Catálogo */
+    .catalog-section {
+      max-width: 1100px;
+      margin: 1rem auto 4rem auto;
+      padding: 0 1.5rem;
+      width: 100%;
+    }
+
+    .catalog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1.5rem;
+    }
+
+    .catalog-header h2 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #f1f5f9;
+      margin-top: 0.25rem;
+    }
+
+    .catalog-tag {
+      font-size: 0.8rem;
+      color: #38bdf8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .product-card {
+      background-color: #121324;
+      border: 1px solid #232542;
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: #38bdf8;
+    }
+
+    .card-thumb {
+      height: 200px;
+      background-color: #1e1b4b;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      border: 1px solid #4338ca;
+      position: relative;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background-color: #064e3b;
+      color: #6ee7b7;
+      border: 1px solid #059669;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+
+    .card-badge-lp {
+      background-color: #854d0e;
+      color: #fde047;
+      border-color: #ca8a04;
+    }
+
+    .product-game {
+      font-size: 0.75rem;
+      color: #94a3b8;
+    }
+
+    .product-name {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #f8fafc;
+      margin: 0.25rem 0 0.75rem 0;
+    }
+
+    .product-footer {
+      margin-top: auto;
+      border-top: 1px solid #232542;
+      padding-top: 0.75rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .product-price-ref {
+      font-size: 0.7rem;
+      color: #64748b;
+      display: block;
+    }
+
+    .product-price {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #38bdf8;
+    }
+
+    .btn-buy {
+      background: #232542;
+      color: #e2e8f0;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .btn-buy:hover {
+      background: #334155;
+      color: white;
+    }
+
+    footer {
+      background-color: #0c0d18;
+      border-top: 1px solid #1a1b30;
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="/" class="brand">
+      <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="22" y="18" width="46" height="64" rx="5" fill="#4c1d95" stroke="#7c3aed" stroke-width="2" transform="rotate(-15 45 50)"/>
+        <rect x="30" y="16" width="46" height="64" rx="5" fill="#1e1b4b" stroke="#38bdf8" stroke-width="2.5" />
+        <path d="M35 24L71 60M35 34L71 70" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+        <ellipse cx="53" cy="54" rx="22" ry="7" fill="#facc15" stroke="#ca8a04" stroke-width="1.5" />
+        <path d="M42 51C42 46 64 46 64 51Z" fill="#ef4444" />
+        <path d="M43 50C43 40 63 40 63 50Z" fill="#eab308" stroke="#ca8a04" stroke-width="1" />
+      </svg>
+      <span class="brand-title">El Rincón del Dualista</span>
+    </a>
+
+    <nav class="nav-links">
+      <a href="#catalogo" class="nav-link">Catálogo</a>
+      <a href="/publicar" class="btn-nav">Escanear Carta</a>
+    </nav>
+  </header>
+
+  <main class="hero">
+    <div class="badge-hero">
+      <span>●</span> Inteligencia Artificial & Escrow Transaccional
+    </div>
+
+    <h1 class="hero-title">
+      Compra, vende y cotiza cartas TCG con <span>Inteligencia Artificial</span>
+    </h1>
+
+    <p class="hero-desc">
+      El marketplace especializado para duelistas y coleccionistas. Reconocimiento instantáneo con visión artificial, cotización en dólares y pesos chilenos, y pagos custodiados.
+    </p>
+
+    <a href="/publicar" class="btn-scan-main">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+        <circle cx="12" cy="13" r="4"></circle>
+      </svg>
+      Escanear y Publicar Carta
+    </a>
+  </main>
+
+  <section class="catalog-section" id="catalogo">
+    <div class="catalog-header">
+      <div>
+        <span class="catalog-tag">Mercado Oficial</span>
+        <h2>Cartas Destacadas</h2>
+      </div>
+      <span style="font-size: 0.85rem; color: #94a3b8;">Protegidas por Custodia Escrow</span>
+    </div>
+
+    <div class="catalog-grid">
+      <article class="product-card">
+        <div class="card-thumb">
+          <span class="card-badge">Near Mint</span>
+          <span style="color: #a855f7; font-weight: bold; font-size: 0.85rem;">[ Monkey D. Luffy - Manga Art ]</span>
+        </div>
+        <span class="product-game">One Piece Card Game • OP-05</span>
+        <h3 class="product-name">Monkey D. Luffy (SEC)</h3>
+        <div class="product-footer">
+          <div>
+            <span class="product-price-ref">Ref: $420.00 USD</span>
+            <span class="product-price">$385.000 CLP</span>
+          </div>
+          <a href="/publicar" class="btn-buy">Ver</a>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="card-thumb">
+          <span class="card-badge">Near Mint</span>
+          <span style="color: #a855f7; font-weight: bold; font-size: 0.85rem;">[ Charizard ex - SAR ]</span>
+        </div>
+        <span class="product-game">Pokémon TCG • 151 (MEW 199/165)</span>
+        <h3 class="product-name">Charizard ex (Special Illus.)</h3>
+        <div class="product-footer">
+          <div>
+            <span class="product-price-ref">Ref: $97.63 USD</span>
+            <span class="product-price">$90.000 CLP</span>
+          </div>
+          <a href="/publicar" class="btn-buy">Ver</a>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="card-thumb">
+          <span class="card-badge">Near Mint</span>
+          <span style="color: #a855f7; font-weight: bold; font-size: 0.85rem;">[ Roronoa Zoro - Leader Alt Art ]</span>
+        </div>
+        <span class="product-game">One Piece Card Game • Romance Dawn</span>
+        <h3 class="product-name">Roronoa Zoro (Alt Art)</h3>
+        <div class="product-footer">
+          <div>
+            <span class="product-price-ref">Ref: $52.00 USD</span>
+            <span class="product-price">$48.500 CLP</span>
+          </div>
+          <a href="/publicar" class="btn-buy">Ver</a>
+        </div>
+      </article>
+
+      <article class="product-card">
+        <div class="card-thumb">
+          <span class="card-badge card-badge-lp">Lightly Played</span>
+          <span style="color: #a855f7; font-weight: bold; font-size: 0.85rem;">[ The One Ring - Foil ]</span>
+        </div>
+        <span class="product-game">Magic: The Gathering • Tales of M.E.</span>
+        <h3 class="product-name">The One Ring (0246)</h3>
+        <div class="product-footer">
+          <div>
+            <span class="product-price-ref">Ref: $115.00 USD</span>
+            <span class="product-price">$105.000 CLP</span>
+          </div>
+          <a href="/publicar" class="btn-buy">Ver</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <footer>
+    <p>© 2026 El Rincón del Dualista</p>
+  </footer>
+
+</body>
+</html>
