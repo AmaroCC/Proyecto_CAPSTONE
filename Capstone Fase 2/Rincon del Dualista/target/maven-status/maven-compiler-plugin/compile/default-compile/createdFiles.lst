@@ -1,0 +1,4 @@
+cl\rincon\dualista\controlador\DualistaControlador.class
+cl\rincon\dualista\servicio\EscaneoTcgService.class
+cl\rincon\dualista\modelo\RespuestaCartaDTO.class
+cl\rincon\dualista\DualistaApplication.class

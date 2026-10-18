@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Administrador - El Rincón del Dualista</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0b0c16; color: #f8fafc; }
+    .navbar { background: #1e1b4b; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .container { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+    table { width: 100%; border-collapse: collapse; background: #121324; border-radius: 12px; overflow: hidden; margin-top: 1.5rem; }
+    th, td { padding: 1rem; text-align: left; border-bottom: 1px solid #232542; }
+    th { background: #191b30; color: #38bdf8; font-size: 0.85rem; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <strong>⚙️ Panel de Control Administrador - El Rincón del Dualista</strong>
+    <div>
+      <a href="/" style="color:#38bdf8; margin-right:1rem; text-decoration:none;">Ver Tienda</a>
+      <a href="/logout" style="color:#fca5a5; text-decoration:none;">Cerrar Sesión</a>
+    </div>
+  </nav>
+  <main class="container">
+    <h2>Gestión de Inventario y Cotizaciones Escrow</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Juego</th>
+          <th>Carta</th>
+          <th>Rareza</th>
+          <th>Estado</th>
+          <th>Precio USD</th>
+          <th>Precio CLP</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="c : ${cartas}">
+          <td th:text="${c.juego}"></td>
+          <td th:text="${c.nombre}"></td>
+          <td th:text="${c.rareza}"></td>
+          <td th:text="${c.estado}"></td>
+          <td th:text="'$' + ${c.precioUSD}"></td>
+          <td th:text="'$' + ${#numbers.formatInteger(c.precioCLP, 1, 'POINT')} + ' CLP'"></td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>
