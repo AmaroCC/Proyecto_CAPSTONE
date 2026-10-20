@@ -1,0 +1,8 @@
+cl\rincon\dualista\modelo\Usuario.class
+cl\rincon\dualista\repositorio\CartaRepository.class
+cl\rincon\dualista\repositorio\UsuarioRepository.class
+cl\rincon\dualista\controlador\DualistaControlador.class
+cl\rincon\dualista\servicio\EscaneoTcgService.class
+cl\rincon\dualista\servicio\EmailService.class
+cl\rincon\dualista\modelo\RespuestaCartaDTO.class
+cl\rincon\dualista\DualistaApplication.class

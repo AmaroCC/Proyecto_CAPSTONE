@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Escanear Carta con IA - El Rincón del Dualista</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0b0c16; color: #e2e8f0; }
+    .navbar { background: #121324; border-bottom: 1px solid #232542; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #facc15, #38bdf8, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .btn { padding: 0.6rem 1.05rem; border-radius: 8px; text-decoration: none; font-size: 0.86rem; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+    .btn-outline { background: transparent; border: 1px solid #38bdf8; color: #38bdf8; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .container { max-width: 900px; margin: 2.5rem auto; padding: 0 1.5rem; }
+
+    .scanner-box { background: #121324; border: 2px dashed #38bdf8; border-radius: 16px; padding: 2.5rem; text-align: center; cursor: pointer; transition: 0.2s; margin-bottom: 2rem; }
+    .scanner-box:hover { background: #181a33; border-color: #6366f1; }
+    
+    .result-card { background: #121324; border: 1px solid #232542; border-radius: 16px; padding: 2rem; display: none; gap: 2rem; align-items: center; margin-top: 1.5rem; }
+    @media(max-width: 768px) { .result-card { flex-direction: column; } }
+    
+    .card-img-preview { width: 260px; height: 360px; background: #0b0c16; border-radius: 12px; border: 1px solid #2e325a; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 10px; flex-shrink: 0; }
+    .card-img-preview img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+    
+    .badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 6px; font-size: 0.78rem; font-weight: 800; background: rgba(56,189,248,0.15); color: #38bdf8; margin-bottom: 0.8rem; }
+    .price-box { background: #0b0c16; border: 1px solid #232542; border-radius: 12px; padding: 1.2rem; margin-top: 1rem; }
+    .price-clp { font-size: 2rem; font-weight: 800; color: #34d399; }
+    .spinner { display: none; width: 40px; height: 40px; border: 4px solid #2e325a; border-top-color: #38bdf8; border-radius: 50%; animation: spin 1s linear infinite; margin: 1rem auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="/" class="brand">⚡ El Rincón del Dualista 🏴‍☠️</a>
+    <div style="display:flex; gap:1rem; align-items:center;">
+      <span th:if="${usuario != null}" th:text="'👤 ' + ${usuario} + ' (' + ${rol} + ')'" style="color:#38bdf8; font-weight:700; font-size:0.9rem;"></span>
+      <a href="/" class="btn btn-outline">⬅️ Volver al Catálogo</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div style="margin-bottom: 2rem;">
+      <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Escáner IA & Cotizador TCG en Tiempo Real</h1>
+      <p style="color: #94a3b8; font-size: 0.95rem;">Sube la foto de tu carta para identificarla con inteligencia artificial y cotizar su valor oficial en TCGplayer convertido a pesos chilenos.</p>
+    </div>
+
+    <div class="scanner-box" onclick="document.getElementById('fileInput').click()">
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">📸</div>
+      <h3 style="color: #fff; margin-bottom: 0.4rem;">Haz clic aquí para subir la foto de tu carta</h3>
+      <p style="color: #94a3b8; font-size: 0.85rem;">Soporta fotos tomadas con el celular o imágenes de internet (JPG, PNG, WEBP)</p>
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="subirCarta(this)">
+    </div>
+
+    <div id="loading" class="spinner"></div>
+    <div id="errorBox" style="display:none; background:rgba(239,68,68,0.15); border:1px solid #ef4444; color:#fca5a5; padding:1rem; border-radius:10px; margin-top:1rem;"></div>
+
+    <div id="resultCard" class="result-card">
+      <div class="card-img-preview">
+        <img id="imgResultado" src="" alt="Carta Escaneada">
+      </div>
+      <div style="flex: 1;">
+        <span id="resJuego" class="badge">Pokémon TCG</span>
+        <h2 id="resNombre" style="font-size: 1.5rem; color: #fff; margin-bottom: 0.3rem;">-</h2>
+        <p id="resRareza" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.4rem;">-</p>
+        <p id="resEstado" style="color: #38bdf8; font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem;">-</p>
+        
+        <div class="price-box">
+          <div style="font-size: 0.78rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 0.2rem;">Valor de Mercado en Chile</div>
+          <div id="resPrecioCLP" class="price-clp">$0 CLP</div>
+          <div style="font-size: 0.82rem; color: #94a3b8; margin-top: 0.4rem;">
+            Precio TCGplayer: <span id="resPrecioUSD" style="color:#fff; font-weight:700;">$0 USD</span> | 
+            Tasa de cambio: <span id="resDolar" style="color:#38bdf8;">$0 CLP/USD</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+          <a href="/" class="btn btn-success">✅ Ver en el Catálogo Principal</a>
+          <button onclick="location.reload()" class="btn btn-outline">🔄 Escanear Otra Carta</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    async function subirCarta(input) {
+      if (!input.files || !input.files[0]) return;
+      const archivo = input.files[0];
+      
+      // Mostrar la foto localmente de inmediato mientras procesa la IA
+      const urlLocal = URL.createObjectURL(archivo);
+
+      document.getElementById('loading').style.display = 'block';
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('errorBox').style.display = 'none';
+
+      const formData = new FormData();
+      formData.append("imagen", archivo);
+
+      try {
+        const res = await fetch('/api/cartas/escanear', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        document.getElementById('loading').style.display = 'none';
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Error al procesar el escaneo.');
+        }
+
+        // Rellenar datos
+        document.getElementById('imgResultado').src = urlLocal; // Usa la foto que subiste
+        document.getElementById('resJuego').innerText = data.juego;
+        document.getElementById('resNombre').innerText = data.nombre;
+        document.getElementById('resRareza').innerText = "Rareza: " + data.rareza;
+        document.getElementById('resEstado').innerText = "Condición estimada: " + data.estado;
+        document.getElementById('resPrecioCLP').innerText = "$" + Number(data.precioCLP).toLocaleString('es-CL') + " CLP";
+        document.getElementById('resPrecioUSD').innerText = "$" + data.precioUSD + " USD";
+        document.getElementById('resDolar').innerText = "$" + data.valorDolarActual + " CLP/USD";
+
+        document.getElementById('resultCard').style.display = 'flex';
+      } catch (err) {
+        document.getElementById('loading').style.display = 'none';
+        const box = document.getElementById('errorBox');
+        box.innerText = "⚠️ " + err.message;
+        box.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

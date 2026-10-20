@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Cuenta - El Rincón del Dualista</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0b0c16; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1.5rem; }
+    .box { background: #121324; border: 1px solid #232542; border-radius: 16px; padding: 2.2rem; width: 100%; max-width: 460px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+    .brand { font-size: 1.4rem; font-weight: 800; text-align: center; margin-bottom: 0.3rem; color: #34d399; }
+    .sub { text-align: center; color: #94a3b8; font-size: 0.88rem; margin-bottom: 1.5rem; }
+    label { display: block; font-size: 0.84rem; color: #cbd5e1; margin-bottom: 0.35rem; font-weight: 600; }
+    input, select { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #2e325a; background: #0b0c16; color: #fff; margin-bottom: 1rem; }
+    .btn { width: 100%; padding: 0.85rem; background: linear-gradient(135deg, #10b981, #059669); border: none; border-radius: 8px; color: #fff; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+    .error { background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; margin-bottom: 1rem; }
+    #cajaCodigoAdmin { display: none; background: #191b30; padding: 0.85rem; border-radius: 8px; border: 1px dashed #facc15; margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="brand">📝 Crear Cuenta con Correo</div>
+    <p class="sub">Regístrate con tu correo; luego accederás solo con tu Nombre y Contraseña.</p>
+
+    <div th:if="${error}" class="error" th:text="${error}"></div>
+
+    <form method="post" action="/registro">
+      <label>Correo Electrónico</label>
+      <input type="email" name="email" placeholder="tucorreo@ejemplo.cl" required>
+
+      <label>Nombre de Usuario (Lo usarás para iniciar sesión)</label>
+      <input type="text" name="username" placeholder="Ej: AshKetchum" required>
+
+      <label>Contraseña</label>
+      <input type="password" name="password" placeholder="Crea tu contraseña" required>
+
+      <label>Tipo de Cuenta</label>
+      <select name="rol" id="rolSelect" onchange="verificarRol()">
+        <option value="CLIENTE">👤 Cliente (Ver y Escanear Cartas)</option>
+        <option value="ADMIN">⚙️ Administrador (Agregar y Eliminar Cartas del Catálogo)</option>
+      </select>
+
+      <div id="cajaCodigoAdmin">
+        <label style="color:#fde047;">🔑 Código de Autorización Admin</label>
+        <input type="text" name="codigoAdmin" placeholder="Escribe: DUALISTA2026" style="margin-bottom:0.2rem;">
+        <small style="color:#94a3b8; font-size:0.75rem;">Ingresa <b>DUALISTA2026</b> para activar permisos de Administrador.</small>
+      </div>
+
+      <button type="submit" class="btn">✅ Registrar Cuenta en Supabase</button>
+    </form>
+
+    <div style="text-align:center; margin-top:1.2rem; font-size:0.88rem;">
+      ¿Ya tienes cuenta? <a href="/login" style="color:#38bdf8; text-decoration:none; font-weight:700;">Ir a Iniciar Sesión</a>
+    </div>
+  </div>
+
+  <script>
+    function verificarRol() {
+      const rol = document.getElementById('rolSelect').value;
+      document.getElementById('cajaCodigoAdmin').style.display = (rol === 'ADMIN') ? 'block' : 'none';
+    }
+  </script>
+</body>
+</html>

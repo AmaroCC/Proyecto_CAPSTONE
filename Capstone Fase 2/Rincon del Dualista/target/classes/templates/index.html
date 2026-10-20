@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Catálogo Pokémon & One Piece TCG - El Rincón del Dualista</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background: #0b0c16; color: #e2e8f0; }
+    .navbar { background: #121324; border-bottom: 1px solid #232542; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; flex-wrap: wrap; gap: 1rem; }
+    .brand { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #facc15, #38bdf8, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none; }
+    .nav-links { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; }
+    .btn { padding: 0.6rem 1.05rem; border-radius: 8px; text-decoration: none; font-size: 0.86rem; font-weight: 700; cursor: pointer; border: none; transition: 0.2s; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #38bdf8); color: #fff; }
+    .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: #fff; }
+    .btn-admin { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid #38bdf8; color: #38bdf8; }
+    .btn-danger { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; color: #fca5a5; padding: 0.4rem 0.7rem; border-radius: 6px; font-size: 0.78rem; cursor: pointer; }
+    .container { max-width: 1220px; margin: 2rem auto; padding: 0 1.5rem; }
+
+    .hero { background: linear-gradient(135deg, #161936 0%, #0f172a 100%); border: 1px solid #26294e; border-radius: 16px; padding: 1.6rem 2rem; margin-bottom: 1.6rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .tabs { display: flex; gap: 0.8rem; margin-bottom: 1.2rem; flex-wrap: wrap; }
+    .tab-btn { padding: 0.7rem 1.4rem; border-radius: 10px; background: #121324; border: 1px solid #232542; color: #94a3b8; font-weight: 700; cursor: pointer; font-size: 0.92rem; }
+    .tab-btn.active { background: #1e293b; color: #fff; border-color: #38bdf8; }
+
+    .controls { background: #121324; border: 1px solid #232542; padding: 1.1rem; border-radius: 12px; display: flex; gap: 0.8rem; margin-bottom: 1.8rem; flex-wrap: wrap; align-items: center; }
+    .controls input, .controls select { padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid #2e325a; background: #0b0c16; color: #fff; font-size: 0.92rem; }
+    .controls input { flex: 1; min-width: 240px; }
+
+    .admin-panel-box { background: #121324; border: 1px dashed #f59e0b; padding: 1.5rem; border-radius: 14px; margin-bottom: 1.8rem; display: none; }
+    .admin-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
+    .admin-form-grid input, .admin-form-grid select { padding: 0.65rem; border-radius: 8px; border: 1px solid #2e325a; background: #0b0c16; color: #fff; font-size: 0.88rem; width: 100%; }
+
+    .user-table-box { background: #121324; border: 1px solid #232542; padding: 1.5rem; border-radius: 14px; margin-bottom: 1.8rem; display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; text-align: left; font-size: 0.9rem; }
+    th, td { padding: 0.75rem; border-bottom: 1px solid #1f223d; }
+    th { color: #38bdf8; }
+
+    /* ESTILOS DEL MODAL PROPIO */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(11, 12, 22, 0.8); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-card { background: #161936; border: 1px solid #2e325a; padding: 2rem; border-radius: 16px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
+    .card { background: #121324; border: 1px solid #232542; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s; position: relative; }
+    .card:hover { transform: translateY(-5px); border-color: #38bdf8; }
+    .card-img-wrap { width: 100%; height: 310px; background: radial-gradient(circle, #1a1c36 0%, #090a12 100%); display: flex; align-items: center; justify-content: center; padding: 14px; }
+    .card-img-wrap img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; }
+    .card-body { padding: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem; flex: 1; }
+    .badge-poke { align-self: flex-start; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; background: rgba(250,204,21,0.15); color: #facc15; }
+    .badge-op { align-self: flex-start; font-size: 0.72rem; font-weight: 800; padding: 0.25rem 0.65rem; border-radius: 6px; background: rgba(239,68,68,0.15); color: #f87171; }
+    .price-box { margin-top: auto; padding-top: 0.7rem; border-top: 1px solid #1f223d; display: flex; justify-content: space-between; align-items: center; }
+    .price-clp { font-size: 1.2rem; font-weight: 800; color: #34d399; }
+    .price-usd { font-size: 0.78rem; color: #94a3b8; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <!-- MODAL DE CONFIRMACIÓN PROPIO -->
+  <div id="customModal" class="modal-overlay">
+    <div class="modal-card">
+      <div style="font-size: 2.5rem; margin-bottom: 0.8rem;">⚠️</div>
+      <h3 style="color: #fff; font-size: 1.2rem; margin-bottom: 0.5rem;">Confirmar Acción</h3>
+      <p id="modalMensaje" style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 1.5rem;">¿Estás seguro de que deseas realizar esta acción?</p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button onclick="cerrarModal()" class="btn btn-outline" style="flex: 1;">Cancelar</button>
+        <button id="modalBtnConfirmar" class="btn btn-danger" style="flex: 1;">Sí, Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <a href="/" class="brand">⚡ El Rincón del Dualista 🏴‍☠️</a>
+    <div class="nav-links">
+      <a href="/publicar" class="btn btn-primary">📸 Escanear Carta con IA</a>
+      <a th:if="${usuario == null}" href="/login" class="btn btn-outline">🔑 Iniciar Sesión</a>
+      <a th:if="${usuario == null}" href="/registro" class="btn btn-success">📝 Crear Cuenta (Registro)</a>
+      <span th:if="${usuario != null}" th:text="'👤 ' + ${usuario} + ' (' +${rol} + ')'" style="color:#38bdf8; font-weight:700; font-size:0.9rem;"></span>
+      <a th:if="${usuario != null}" href="/logout" class="btn btn-outline">Salir</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="hero">
+      <div>
+        <h1>Catálogo Oficial: Pokémon TCG & One Piece TCG</h1>
+        <p style="color:#94a3b8;">Conectado en tiempo real a tu base de datos en Supabase.</p>
+      </div>
+      <div th:if="${rol == 'ADMIN'}" style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+        <button onclick="toggleFormAdmin()" class="btn btn-admin">➕ Agregar Carta</button>
+        <button onclick="toggleUsersAdmin()" class="btn btn-outline" style="border-color:#f59e0b; color:#f59e0b;">👥 Gestionar Usuarios</button>
+      </div>
+    </div>
+
+    <!-- PANEL DE AGREGAR CARTA -->
+    <div id="adminFormBox" class="admin-panel-box" th:if="${rol == 'ADMIN'}">
+      <h3 style="color:#f59e0b; margin-bottom:0.5rem;">⚙️ Panel de Control Admin: Agregar Nueva Carta</h3>
+      <p style="color:#94a3b8; font-size:0.85rem;">Ingresa los datos de la carta. Se guardará permanentemente en Supabase y el precio en CLP se calculará automáticamente.</p>
+      <form method="post" action="/admin/cartas/agregar">
+        <div class="admin-form-grid">
+          <div>
+            <label style="font-size:0.8rem; color:#cbd5e1; margin-bottom:0.3rem; display:block;">Juego TCG</label>
+            <select name="juego" required>
+              <option value="Pokémon TCG">⚡ Pokémon TCG</option>
+              <option value="One Piece TCG">🏴‍☠️ One Piece TCG</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:#cbd5e1; margin-bottom:0.3rem; display:block;">Nombre y Código</label>
+            <input type="text" name="nombre" placeholder="Ej: Zorro - OP06-118" required>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:#cbd5e1; margin-bottom:0.3rem; display:block;">Rareza / Edición</label>
+            <input type="text" name="rareza" placeholder="Ej: Manga Rare" required>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:#cbd5e1; margin-bottom:0.3rem; display:block;">Estado Físico</label>
+            <select name="estado">
+              <option value="Mint (98%)">Mint (98%)</option>
+              <option value="Near Mint (95%)" selected>Near Mint (95%)</option>
+              <option value="Lightly Played (85%)">Lightly Played (85%)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:#cbd5e1; margin-bottom:0.3rem; display:block;">Precio USD ($)</label>
+            <input type="text" name="precioUSD" placeholder="Ej: 3.311 o 3311" required>
+          </div>
+          <div>
+            <label style="font-size:0.8rem; color:#cbd5e1; margin-bottom:0.3rem; display:block;">URL de la Imagen</label>
+            <input type="url" name="imagenUrl" placeholder="https://..." required>
+          </div>
+        </div>
+        <div style="margin-top:1rem; text-align:right;">
+          <button type="submit" class="btn btn-success">💾 Guardar Carta en Supabase</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- PANEL DE GESTIÓN DE USUARIOS -->
+    <div id="adminUsersBox" class="user-table-box" th:if="${rol == 'ADMIN'}">
+      <h3 style="color:#f59e0b; margin-bottom:0.5rem;">👥 Cuentas y Correos Registrados</h3>
+      <p style="color:#94a3b8; font-size:0.85rem;">Aquí puedes ver los usuarios registrados en el sistema y eliminar cuentas o correos no deseados.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Correo Electrónico</th>
+            <th>Rol</th>
+            <th>Verificado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="u : ${usuarios}">
+            <td th:text="${u.username}" style="font-weight:600; color:#fff;"></td>
+            <td th:text="${u.email}"></td>
+            <td>
+              <span th:text="${u.rol}" th:style="${u.rol == 'ADMIN'} ? 'color:#f59e0b; font-weight:700;' : 'color:#38bdf8;'"></span>
+            </td>
+            <td>
+              <span th:text="${u.verificado} ? '✅ Sí' : '⏳ Pendiente'" th:style="${u.verificado} ? 'color:#34d399;' : 'color:#facc15;'"></span>
+            </td>
+            <td>
+              <!-- SEGURO USANDO ATRIBUTOS DATA-* EN LUGAR DE INYECCIÓN DIRECTA EN ONCLICK -->
+              <button type="button" class="btn-danger btn-eliminar-usuario"
+                      th:data-url="@{/admin/usuarios/eliminar/{id}(id=${u.id})}"
+                      th:data-nombre="${u.username}">
+                🗑️ Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tab-TODOS" onclick="cambiarJuego('TODOS')">🌟 Todo el Catálogo</button>
+      <button class="tab-btn" id="tab-Pokémon TCG" onclick="cambiarJuego('Pokémon TCG')">⚡ Pokémon TCG</button>
+      <button class="tab-btn" id="tab-One Piece TCG" onclick="cambiarJuego('One Piece TCG')">🏴‍☠️ One Piece TCG</button>
+    </div>
+
+    <div class="controls">
+      <input type="text" id="busquedaInput" placeholder="Buscar por personaje, código o rareza..." onkeyup="filtrarCatalogo()">
+      <select id="ordenSelect" onchange="filtrarCatalogo()">
+        <option value="default">Ordenar por: Más recientes</option>
+        <option value="mayor">Precio: Mayor a Menor</option>
+        <option value="menor">Precio: Menor a Mayor</option>
+      </select>
+    </div>
+
+    <div class="grid" id="contenedorCartas"></div>
+  </main>
+
+  <script>
+    let juegoActual = 'TODOS';
+    let rolUsuario = '[[${rol}]]';
+
+    // Manejador global para los botones de eliminar usuarios mediante data attributes
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.classList.contains('btn-eliminar-usuario')) {
+        const url = e.target.getAttribute('data-url');
+        const nombre = e.target.getAttribute('data-nombre');
+        mostrarModal(url, `¿Estás seguro de que deseas eliminar al usuario ${nombre}?`);
+      }
+    });
+
+    function mostrarModal(urlAccion, mensaje) {
+      document.getElementById('modalMensaje').innerText = mensaje;
+      const btnConf = document.getElementById('modalBtnConfirmar');
+      btnConf.onclick = function() {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = urlAccion;
+        document.body.appendChild(form);
+        form.submit();
+      };
+      document.getElementById('customModal').style.display = 'flex';
+    }
+
+    function cerrarModal() {
+      document.getElementById('customModal').style.display = 'none';
+    }
+
+    function toggleFormAdmin() {
+      const box = document.getElementById('adminFormBox');
+      const usersBox = document.getElementById('adminUsersBox');
+      usersBox.style.display = 'none';
+      box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function toggleUsersAdmin() {
+      const box = document.getElementById('adminUsersBox');
+      const formBox = document.getElementById('adminFormBox');
+      formBox.style.display = 'none';
+      box.style.display = (box.style.display === 'block') ? 'none' : 'block';
+    }
+
+    async function cambiarJuego(juego) {
+      juegoActual = juego;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + juego).classList.add('active');
+      await filtrarCatalogo();
+    }
+
+    async function filtrarCatalogo() {
+      const q = document.getElementById('busquedaInput').value;
+      const orden = document.getElementById('ordenSelect').value;
+      const res = await fetch(`/api/cartas/buscar?q=${encodeURIComponent(q)}&juego=${encodeURIComponent(juegoActual)}`);
+      let lista = await res.json();
+
+      if (orden === 'mayor') lista.sort((a, b) => b.precioCLP - a.precioCLP);
+      if (orden === 'menor') lista.sort((a, b) => a.precioCLP - b.precioCLP);
+
+      renderizarCartas(lista);
+    }
+
+    function renderizarCartas(lista) {
+      const cont = document.getElementById('contenedorCartas');
+      if (lista.length === 0) {
+        cont.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:3rem; color:#94a3b8;">No se encontraron cartas.</div>`;
+        return;
+      }
+      cont.innerHTML = lista.map(c => {
+        const esOnePiece = c.juego.toLowerCase().includes('one piece');
+        const badgeClass = esOnePiece ? 'badge-op' : 'badge-poke';
+        const icono = esOnePiece ? '🏴‍☠️ ' : '⚡ ';
+        
+        const btnBorrar = (rolUsuario === 'ADMIN') ? `
+          <button type="button" class="btn-danger" onclick="mostrarModal('/admin/cartas/eliminar/${c.id}', '¿Estás seguro de que deseas eliminar esta carta del catálogo?')" style="margin-top:0.4rem;">🗑️ Borrar Carta</button>
+        ` : '';
+
+        return `
+          <div class="card">
+            <div class="card-img-wrap">
+              <img src="${c.imagenUrl}" alt="${c.nombre}" onerror="this.src='https://assets.tcgdex.net/en/sv/sv03.5/199/high.webp'">
+            </div>
+            <div class="card-body">
+              <span class="${badgeClass}">${icono}${c.juego}</span>
+              <h3 style="font-size:1.02rem; color:#fff;">${c.nombre}</h3>
+              <p style="font-size:0.82rem; color:#94a3b8;">${c.rareza}</p>
+              <p style="font-size:0.8rem; color:#38bdf8; font-weight:600;">Estado: ${c.estado}</p>
+              
+              <div class="price-box">
+                <div>
+                  <div class="price-clp">$${Number(c.precioCLP).toLocaleString('es-CL')} CLP</div>
+                  <div class="price-usd">$${c.precioUSD} USD</div>
+                </div>
+                <div>${btnBorrar}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    filtrarCatalogo();
+  </script>
+</body>
+</html>
