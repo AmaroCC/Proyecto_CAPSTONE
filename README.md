@@ -12,3 +12,20 @@ Cuenta de Administrador        Cuenta de Cliente
 Usuario:admin                 Usuario:cliente 
 Contraseña: admin123           Contraseña:cliente123
 Codigo de registro admin:DUALISTA2026
+comandos para ejecutar el código dentro de otro dispositivo instalando las dependencias:
+winget install --id EclipseAdoptium.Temurin.17.JDK -e --silent --accept-package-agreements --accept-source-agreements
+
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+$env:JAVA_HOME = Split-Path (Split-Path (Get-Command java).Source)
+
+java -version 
+
+Del caso que no funcione el anterior comando ejecutar este en la terminal.
+
+$mvnw = Get-ChildItem -Filter "mvnw.cmd" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($mvnw) {
+    cd $mvnw.DirectoryName
+    .\mvnw.cmd spring-boot:run
+} else {
+    Write-Host "No se encontró mvnw.cmd en esta ruta ni en subcarpetas." -ForegroundColor Yellow
+}
